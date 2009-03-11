@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script for importing PPA OpenPGP keys 
 # for all entries in your sources.list File
-# Version 0.1
+# Version 0.2
 # You'll need curl (http://curl.haxx.se/) to run
 # this script, if it's not installed, the script will
 # do it for you
@@ -12,7 +12,7 @@ if [ ! -f /usr/bin/curl ]; then
 fi
 if [ "$1" != "" ]; then
 
-    slist=( `grep launchpad $1 | sed -e 's/.*net\/\(.*\)\/.*/\1/'` )
+    slist=( `grep launchpad $1 | sed -e 's/.*net\/\(.*\)\/.*/\1/' -e 's/\/ppa//'` )
     num=${#slist}
     for ((i=0;i<$num;i++)); do
         if [ "${slist[${i}]}" != "" ]; then
