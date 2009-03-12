@@ -18,6 +18,17 @@ sourcesList='/etc/apt/sources.list'
 # Editing beyond this line on your own risk ;-)
 ###############################################
 
+# HELP
+if [ "$1" == "--help" ]; then
+    echo "This script needs to be run with root permissions"
+    echo ""
+    echo "You can use your own sources.list as parameter:"
+    echo "sudo import-all-ppa-keys /path/to/sources.list"
+    echo ""
+    echo "If no parameter is given, standard /etc/apt/sources.list will be used"
+    exit 0
+fi    
+
 # Check for superuser priviliges
 if [ "$USER" != 'root' ]; then
     echo "Error: Your calling this script without root-permissions." >&2
