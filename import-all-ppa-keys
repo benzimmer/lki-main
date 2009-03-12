@@ -2,27 +2,34 @@
 # Script for importing PPA OpenPGP keys 
 # for all entries in your sources.list File
 # Version 0.2
+#
+# This script is licensed under the MIT License
+# see http://www.opensource.org/licenses/mit-license.php
+
 # You'll need curl (http://curl.haxx.se/) to run
 # this script, if it's not installed, the script will
 # do it for you
 
+# Looking for curl, install if necessary
 if [ ! -f /usr/bin/curl ]; then
     echo "Need curl, trying to install it"
     sudo apt-get install curl
 fi
 if [ "$1" != "" ]; then
 
+    # extract launchpad project names
     slist=( `grep launchpad $1 | sed -e 's/.*net\/\(.*\)\/.*/\1/' -e 's/\/ppa//'` )
     num=${#slist}
     for ((i=0;i<$num;i++)); do
         if [ "${slist[${i}]}" != "" ]; then
 
-            url=https://edge.launchpad.net/~${slist[${i}]}/+archive/ppa
-            echo $url
-            string=`curl -s $url | grep 'OpenPGP key' | sed -e 's/.*\/\(.*\)<\/code.*/\1/'` 
-            echo "$string"
-
-            sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com $string
+            url=https://launchpad.net/~${slist[${i}]}/+archive/ppa
+            echo "PPA URL: $url"
+            # extract key ID from launchpad website
+            keyid=`curl -s $url | grep 'OpenPGP key' | sed -e 's/.*\/\(.*\)<\/code.*/\1/'` 
+            echo "key ID: $keyid"
+            # get keys from keyserver
+            sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com $keyid
 
             if [ $? = 0 ]; then
                 echo ""
