@@ -10,16 +10,46 @@
 # this script, if it's not installed, the script will
 # do it for you
 
+# Configuration
+
+# Path to your standard sources.list file
+sourcesList='/etc/apt/sources.list'
+
+# Editing beyond this line on your own risk ;-)
+###############################################
+
+# Check for superuser priviliges
+if [ "$USER" != 'root' ]; then
+    echo "Error: Your calling this script without root-permissions." >&2
+    echo "Please start this with sudo in front" >&2
+    exit 1
+fi
+
 # Looking for curl, install if necessary
 if [ ! -f /usr/bin/curl ]; then
     echo "Need curl, trying to install it"
     sudo apt-get install curl
 fi
-if [ "$1" != "" ]; then
 
-    # extract launchpad project names
-    slist=( `grep launchpad $1 | sed -e 's/.*net\/\(.*\)\/.*/\1/' -e 's/\/.*$//'` )
-    num=${#slist}
+# Checking if custom .list file parameter was given
+if [ "$1" != "" ]; then
+    sourcesList=$1
+    echo "Using custom source-file: $sourcesList"
+    echo "--------------------------------------"
+else
+    echo "Using standard sources.list: $sourcesList"
+    echo "-------------------------------------------------"
+fi
+
+# Check if file exists
+if [ ! -f "$sourcesList" ]; then
+    echo "Error: $sourcesList is not a file">&2
+    exit 1
+fi
+# extract launchpad project names
+slist=( `grep launchpad $sourcesList | sed -e 's/.*net\/\(.*\)\/.*/\1/' -e 's/\/.*$//'` )
+num=${#slist}
+if [ "$slist" != "" ]; then
     for ((i=0;i<$num;i++)); do
         if [ "${slist[${i}]}" != "" ]; then
 
@@ -40,15 +70,12 @@ if [ "$1" != "" ]; then
                 echo "An error occured, please check the sources entries"
                 echo ""
                 exit 1
-            fi
-
+            fi 
         fi
     done
     echo "All keys imported successfully"
     exit 0
 else
-    echo "Please use the right syntax:"
-    echo "import-all-ppa-keys [sources.list File]"
+    echo "No PPAs found in sources file. Exiting"
     exit 1
 fi
-
