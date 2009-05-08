@@ -36,10 +36,17 @@ if [ "$USER" != 'root' ]; then
     exit 1
 fi
 
-# Looking for curl, install if necessary
+# Check if curl is present, install if necessary
 if [ ! -f /usr/bin/curl ]; then
     echo "Need curl, trying to install it"
     sudo apt-get install curl
+fi
+
+# Check if package ca-certificates is installed
+cacheck=`aptitude search ca-certificates | grep "i   "`
+if [ "$cacheck" == "" ]; then
+    echo "Need package ca-certificates, trying to install it"
+    sudo apt-get install ca-certificates
 fi
 
 # Checking if custom .list file parameter was given
